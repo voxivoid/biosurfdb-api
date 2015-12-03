@@ -6,15 +6,15 @@ var handlers = module.exports = [];
 
 handlers.push(validate({
 	params: {
-		geneId: joi.string().regex(/gi:[0-9]+/i)
+		proteinId: joi.string().regex(/gi:[0-9]+/i)
 	}
 }));
 
 handlers.push(function (err, req, res, next) {
 		var error = {error: ""};
 		if (err.isBoom) {
-			if (err.data[0].path === "params.geneId"){
-				error.error = "Invalid geneId. It must be in the GI:<number> format.";
+			if (err.data[0].path === "params.proteinId"){
+				error.error = "Invalid proteinId. It must be in the GI:<number> format.";
 				res.send(error);
 			}
 		}
@@ -25,7 +25,7 @@ handlers.push(function (err, req, res, next) {
 );
 
 handlers.push(function(req, res, next) {
-	req.app.connection.execute("select * from gene where gene_ncbi like :geneId", { geneId: req.params.geneId }, function(err, rows) {
+	req.app.connection.execute("select * from protein where protein_ncbi like :proteinId", { proteinId: req.params.proteinId }, function(err, rows) {
 		if (err) return next(err);
 		if (rows.length < 1) {
 			console.log(rows);
@@ -45,7 +45,7 @@ handlers.push(function(req, res, next) {
 	else {
 		var error = {error: ""};
 		if (req.isEmpty) {
-			error.error = "Gene " + req.params.geneId + " was not found.";
+			error.error = "Protein " + req.params.proteinId + " was not found.";
 		}
 		res.send(error);
 	}
