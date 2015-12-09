@@ -5,16 +5,19 @@ var validate = require("express-joi-validator");
 var handlers = module.exports = [];
 
 handlers.push(validate({
-	params: {
-		proteinId: joi.string().regex(/gi:[0-9]+/i)
+	query: {
+		id: joi.alternatives().try(
+				joi.string().regex(/gi:[0-9]+$/i),
+				joi.string().regex(/uniprotkb\/\w+:\w+$/i)
+			)
 	}
 }));
 
 handlers.push(function (err, req, res, next) {
 		var error = {error: ""};
 		if (err.isBoom) {
-			if (err.data[0].path === "params.proteinId"){
-				error.error = "Invalid proteinId. It must be in the GI:<number> format.";
+			if (err.data[0].path === "query.id"){
+				error.error = "Invalid id. It must be in the GI:<id> or UniProtKB/<section>:<id> format.";
 				res.send(error);
 			}
 		}
@@ -25,10 +28,9 @@ handlers.push(function (err, req, res, next) {
 );
 
 handlers.push(function(req, res, next) {
-	req.app.connection.execute("select * from protein where protein_ncbi like :proteinId", { proteinId: req.params.proteinId }, function(err, rows) {
+	req.app.connection.execute("select * from protein where protein_ncbi like :id", { id: req.query.id }, function(err, rows) {
 		if (err) return next(err);
 		if (rows.length < 1) {
-			console.log(rows);
 			req.isEmpty = true;
 		}
 		else {
@@ -45,7 +47,7 @@ handlers.push(function(req, res, next) {
 	else {
 		var error = {error: ""};
 		if (req.isEmpty) {
-			error.error = "Protein " + req.params.proteinId + " was not found.";
+			error.error = "Protein " + req.query.id + " was not found.";
 		}
 		res.send(error);
 	}
