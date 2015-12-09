@@ -8,7 +8,6 @@ handlers.push(function(req, res, next) {
 	req.app.connection.execute("select * from pathway_simple where pathway_id like :id", { id: req.query.id }, function(err, rows) {
 		if (err) return next(err);
 		if (rows.length < 1) {
-			console.log(rows);
 			req.isEmpty = true;
 		}
 		else {

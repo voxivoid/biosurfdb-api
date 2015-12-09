@@ -28,7 +28,6 @@ handlers.push(function(req, res, next) {
 	req.app.connection.execute("select * from gene where gene_ncbi like :geneId", { geneId: req.params.geneId }, function(err, rows) {
 		if (err) return next(err);
 		if (rows.length < 1) {
-			console.log(rows);
 			req.isEmpty = true;
 		}
 		else {
