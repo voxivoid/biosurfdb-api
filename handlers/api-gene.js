@@ -6,7 +6,7 @@ var handlers = module.exports = [];
 
 handlers.push(validate({
 	query: {
-		id: joi.string().regex(/gi:[0-9]+/i)
+		id: joi.string().regex(/gi:[0-9]+/i).required()
 	}
 }));
 
@@ -26,6 +26,7 @@ handlers.push(function (err, req, res, next) {
 
 handlers.push(function(req, res, next) {
 	req.app.connection.execute("select * from gene where gene_ncbi like :id", { id: req.query.id }, function(err, rows) {
+		console.log("erro: " + err);
 		if (err) return next(err);
 		if (rows.length < 1) {
 			req.isEmpty = true;

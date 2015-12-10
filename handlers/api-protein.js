@@ -9,7 +9,7 @@ handlers.push(validate({
 		id: joi.alternatives().try(
 				joi.string().regex(/gi:[0-9]+$/i),
 				joi.string().regex(/uniprotkb\/\w+:\w+$/i)
-			)
+			).required()
 	}
 }));
 
